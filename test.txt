@@ -1,0 +1,1 @@
+{"ev":{"vwo_dom_click":1},"fn":"function(evl) {return evl(\"vwo_dom_click\", [['event.targetUrl', 'urlReg', '^https?\\:\\\/\\\/(w{3}\\.)?testdata\\.wingified\\.com\\\/sync\\\/analyse\\.html\\\/?\\?id\\=4000687&test\\=CoalGoal(?:#.*)?$']], 1000);}","dslv":3}
