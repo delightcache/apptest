@@ -1,0 +1,587 @@
+<html lang="en"><head>
+
+<!-- Start VWO Async V3.0 SmartCode -->
+<link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
+<script type="text/javascript" id="vwoCode">
+window._vwo_code || (function() {        
+    const params = new URLSearchParams(window.location.search);
+    const accId = parseInt(params.get("id"));
+    const accountId = accId || 1232918;
+    console.log("Account-Id ->", accountId);
+
+    var account_id = accountId,
+        version = 3.0,
+        settings_tolerance = 2000,
+        hide_element = 'body',
+        hide_element_style =
+        'opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important;transition:none !important';
+    /* DO NOT EDIT BELOW THIS LINE */
+    var t=window,n=document;if(-1<n.URL.indexOf('__vwo_disable__')||t._vwo_code)return;var i=!1,o=n.currentScript,e={sT:settings_tolerance,hES:hide_element_style,hE:hide_element};try{e=Object.assign(JSON.parse(localStorage.getItem('_vwo_'+account_id+'_config')),e)}catch(e){}var code={nonce:o.nonce,settings_tolerance:function(){return e.sT},hide_element:function(){return performance.getEntriesByName('first-contentful-paint')[0]?'':e.hE},hide_element_style:function(){return'{'+e.hES+'}'},getVersion:function(){return version},finish:function(){var e;!i&&(i=!0,e=n.getElementById('_vis_opt_path_hides'))&&e.parentNode.removeChild(e)},finished:function(){return i},addScript:function(e){var t=n.createElement('script');t.src=e,o.nonce&&t.setAttribute('nonce',o.nonce),t.fetchPriority='high',n.head.appendChild(t)},init:function(){t._vwo_settings_timer=setTimeout(function(){code.finish()},this.settings_tolerance());var e=n.createElement('style');e.id='_vis_opt_path_hides',o.nonce&&e.setAttribute('nonce',o.nonce),e.textContent=this.hide_element()+this.hide_element_style(),n.head.appendChild(e),this.addScript('https://dev.visualwebsiteoptimizer.com/tag/'+account_id+'.js')}};t._vwo_code=code;code.init();})();
+</script> 
+<!--End VWO Async SmartCode -->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ShopSim — Mini Ecommerce SPA</title>
+<style>
+  :root{
+    --accent:#ff6f00; --muted:#666; --bg:#f6f7fb; --card:#fff;
+  }
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:#111}
+  header{background:#fff;border-bottom:1px solid #e6e6e6;padding:12px 18px;display:flex;align-items:center;gap:18px;position:sticky;top:0;z-index:50}
+  header img.logo{height:36px}
+  .search{flex:1;display:flex;gap:8px}
+  .search input{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:6px}
+  .search button{padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer}
+  nav.top-actions{display:flex;gap:10px;align-items:center}
+  nav.top-actions button, .link-btn{background:none;border:1px solid #ddd;padding:8px 10px;border-radius:6px;cursor:pointer}
+  .container{max-width:1100px;margin:18px auto;padding:0 16px}
+  .grid{display:grid;grid-template-columns:250px 1fr;gap:18px}
+  .sidebar{background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee}
+  .content{min-height:60vh}
+  .controls{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+  .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid #eee;padding:10px;border-radius:8px;display:flex;flex-direction:column;height:100%}
+  .card img{width:100%;height:150px;object-fit:cover;border-radius:6px}
+  .card h4{margin:8px 0 6px;font-size:15px}
+  .price{color:var(--accent);font-weight:600;margin-top:auto}
+  .btn{padding:8px 10px;border-radius:6px;border:none;cursor:pointer}
+  .btn-primary{background:var(--accent);color:#fff}
+  .muted{color:var(--muted);font-size:13px}
+  .hidden{display:none}
+  .center{text-align:center}
+  .cart-list{background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee}
+  .cart-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px dashed #eee}
+  .cart-row:last-child{border-bottom:none}
+  .quantity{display:flex;align-items:center;gap:6px}
+  input[type=number]{width:60px;padding:6px;border-radius:6px;border:1px solid #ddd}
+  .checkout-summary{background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee;margin-top:12px}
+  footer{padding:20px;text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  /* Product detail */
+  .product-detail{display:flex;gap:20px;flex-wrap:wrap}
+  .prod-media{flex:1;min-width:260px}
+  .prod-info{flex:1;min-width:260px}
+  .badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef7ff;color:#01568a;font-weight:600;font-size:12px}
+  /* responsive */
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+    .sidebar{order:2}
+  }
+</style>
+<body>
+
+<header class="vwo_loaded vwo_loaded_1_0" style="background-color: rgb(255, 127, 0) !important;">
+  <!-- Using uploaded local image as logo (path provided by user) -->
+  <img src="/mnt/data/024fb9b8-c9b5-4e19-a032-d58273b0ac84.png" alt="ShopSim Logo" class="logo" onerror="this.style.display='none'" style="display: none;">
+  <div class="search" role="search">
+    <input id="searchInput" placeholder="Search products, brands and more..." aria-label="Search products">
+    <button id="searchBtn">Search</button>
+  </div>
+  <nav class="top-actions" aria-label="Top actions">
+    <button id="wishlistBtn" class="link-btn">Wishlist (<span id="wishCount">0</span>)</button>
+    <button id="cartBtn" class="link-btn">Cart (<span id="cartCount">0</span>)</button>
+  </nav>
+</header>
+
+<main class="container" id="app">
+  <div id="page-products" class="page">
+    <div class="grid">
+      <aside class="sidebar" aria-label="Filters &amp; categories">
+        <h3>Filters</h3>
+        <div>
+          <label><input type="checkbox" class="filter" value="in-stock" checked=""> In stock</label>
+        </div>
+        <div style="margin-top:10px">
+          <strong>Category</strong>
+          <div><label><input type="radio" name="cat" value="all" checked=""> All</label></div>
+          <div><label><input type="radio" name="cat" value="electronics"> Electronics</label></div>
+          <div><label><input type="radio" name="cat" value="fashion"> Fashion</label></div>
+          <div><label><input type="radio" name="cat" value="home"> Home</label></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong>Price</strong>
+          <div><input id="minPrice" placeholder="Min" type="number" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd"></div>
+          <div style="margin-top:6px"><input id="maxPrice" placeholder="Max" type="number" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd"></div>
+          <button id="applyFilters" class="btn" style="margin-top:8px">Apply</button>
+        </div>
+      </aside>
+
+      <section class="content" aria-live="polite">
+        <div class="controls">
+          <div><strong id="resultsCount">8</strong> results</div>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <select id="sortSelect" aria-label="Sort">
+              <option value="relevance">Sort: Relevance</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Top Rated</option>
+            </select>
+            <button id="clearBtn" class="btn">Clear</button>
+          </div>
+        </div>
+
+        <div class="products" id="productsGrid" aria-live="polite"><div class="card">
+      <img src="https://picsum.photos/id/180/400/300" alt="Noise-Cancelling Headphones">
+      <h4>Noise-Cancelling Headphones</h4>
+      <div class="muted">Rating: 4.5 • electronics</div>
+      <div class="price">$129.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(1)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(1)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(1)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="https://picsum.photos/id/1/400/300" alt="Smartphone X 128GB">
+      <h4>Smartphone X 128GB</h4>
+      <div class="muted">Rating: 4.7 • electronics</div>
+      <div class="price">$699.00</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(2)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(2)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(2)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="https://picsum.photos/id/1025/400/300" alt="Men's Casual Shirt">
+      <h4>Men's Casual Shirt</h4>
+      <div class="muted">Rating: 4.1 • fashion</div>
+      <div class="price">$29.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(3)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(3)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(3)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="https://picsum.photos/id/1062/400/300" alt="Ceramic Mixer Set">
+      <h4>Ceramic Mixer Set</h4>
+      <div class="muted">Rating: 4.2 • home</div>
+      <div class="price">$49.50</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(4)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(4)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(4)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="https://picsum.photos/id/21/400/300" alt="Running Shoes Pro">
+      <h4>Running Shoes Pro</h4>
+      <div class="muted">Rating: 4.6 • fashion</div>
+      <div class="price">$89.00</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(5)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(5)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(5)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="https://picsum.photos/id/250/400/300" alt="4K Smart TV 43&quot;">
+      <h4>4K Smart TV 43"</h4>
+      <div class="muted">Rating: 4.4 • electronics</div>
+      <div class="price">$399.00</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(6)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(6)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(6)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="https://picsum.photos/id/1080/400/300" alt="Blender 500W">
+      <h4>Blender 500W</h4>
+      <div class="muted">Rating: 4 • home</div>
+      <div class="price">$59.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(7)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(7)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(7)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="https://picsum.photos/id/1011/400/300" alt="Women’s Handbag">
+      <h4>Women’s Handbag</h4>
+      <div class="muted">Rating: 4.3 • fashion</div>
+      <div class="price">$79.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(8)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(8)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(8)">♡</button>
+      </div>
+    </div></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Product Detail -->
+  <div id="page-product" class="page hidden container">
+    <button onclick="goHome()" class="btn" style="margin-bottom:12px">← Back to results</button>
+    <div class="card product-detail" id="productDetailCard"></div>
+  </div>
+
+  <!-- Cart Page -->
+  <div id="page-cart" class="page hidden container">
+    <h2>Your Cart</h2>
+    <div class="cart-list" id="cartList"></div>
+    <div class="checkout-summary" id="cartSummary"></div>
+    <div style="margin-top:12px">
+      <button onclick="goCheckout()" class="btn btn-primary">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Page -->
+  <div id="page-checkout" class="page hidden container">
+    <h2>Checkout</h2>
+    <div style="display:flex;gap:18px;flex-wrap:wrap">
+      <form id="checkoutForm" style="flex:1;min-width:300px;background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee">
+        <h3>Shipping</h3>
+        <input name="name" placeholder="Full name" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <input name="address" placeholder="Address" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <input name="city" placeholder="City" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <input name="zip" placeholder="Postal code" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <h3>Payment</h3>
+        <input name="card" placeholder="Card number (mock)" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <div style="display:flex;gap:8px">
+          <input name="exp" placeholder="MM/YY" required="" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ddd">
+          <input name="cvv" placeholder="CVV" required="" style="width:100px;padding:8px;border-radius:6px;border:1px solid #ddd">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:12px">Place Order</button>
+      </form>
+
+      <aside style="width:320px;min-width:260px">
+        <div class="checkout-summary">
+          <h3>Order Summary</h3>
+          <div id="checkoutItems"></div>
+          <hr>
+          <div><strong>Total: </strong> <span id="checkoutTotal">$0</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+</main>
+
+<footer>ShopSim — Test harness for segmentation &amp; personalization flows</footer>
+
+<script>
+/* -----------------------------
+  SAMPLE PRODUCT DATA
+--------------------------------*/
+const PRODUCTS = [
+  {id:1,title:"Noise-Cancelling Headphones",price:129.99,cat:"electronics",rating:4.5,stock:10,img:"https://picsum.photos/id/180/400/300",desc:"Comfortable over-ear with 30hr battery."},
+  {id:2,title:"Smartphone X 128GB",price:699.00,cat:"electronics",rating:4.7,stock:6,img:"https://picsum.photos/id/1/400/300",desc:"Flagship level specs with great camera."},
+  {id:3,title:"Men's Casual Shirt",price:29.99,cat:"fashion",rating:4.1,stock:25,img:"https://picsum.photos/id/1025/400/300",desc:"Breathable fabric, slim fit."},
+  {id:4,title:"Ceramic Mixer Set",price:49.50,cat:"home",rating:4.2,stock:12,img:"https://picsum.photos/id/1062/400/300",desc:"Durable, microwave safe."},
+  {id:5,title:"Running Shoes Pro",price:89.00,cat:"fashion",rating:4.6,stock:8,img:"https://picsum.photos/id/21/400/300",desc:"Lightweight with great support."},
+  {id:6,title:"4K Smart TV 43\"",price:399.00,cat:"electronics",rating:4.4,stock:4,img:"https://picsum.photos/id/250/400/300",desc:"Vivid display with smart apps."},
+  {id:7,title:"Blender 500W",price:59.99,cat:"home",rating:4.0,stock:20,img:"https://picsum.photos/id/1080/400/300",desc:"Multi-speed for smoothies and sauces."},
+  {id:8,title:"Women’s Handbag",price:79.99,cat:"fashion",rating:4.3,stock:15,img:"https://picsum.photos/id/1011/400/300",desc:"Premium faux-leather with zipper pockets."}
+];
+
+/* -----------------------------
+  APP STATE & UTILITIES
+--------------------------------*/
+let state = {
+  products: PRODUCTS.slice(),
+  cart: JSON.parse(localStorage.getItem('shop_cart')||'[]'),
+  wishlist: JSON.parse(localStorage.getItem('shop_wish')||'[]'),
+  current: null // product id
+};
+
+function saveState(){
+  localStorage.setItem('shop_cart', JSON.stringify(state.cart));
+  localStorage.setItem('shop_wish', JSON.stringify(state.wishlist));
+  updateCounts();
+}
+
+/* -----------------------------
+  RENDERING FUNCTIONS
+--------------------------------*/
+const productsGrid = document.getElementById('productsGrid');
+const resultsCount = document.getElementById('resultsCount');
+const cartCount = document.getElementById('cartCount');
+const wishCount = document.getElementById('wishCount');
+
+function renderProducts(list){
+  productsGrid.innerHTML = '';
+  resultsCount.innerText = list.length;
+  if(list.length===0){
+    productsGrid.innerHTML = '<div class="center">No products found</div>';
+    return;
+  }
+  list.forEach(p=>{
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <img src="${p.img}" alt="${escapeHtml(p.title)}">
+      <h4>${escapeHtml(p.title)}</h4>
+      <div class="muted">Rating: ${p.rating} • ${p.cat}</div>
+      <div class="price">$${p.price.toFixed(2)}</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(${p.id})">View</button>
+        <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to cart</button>
+        <button class="btn" onclick="toggleWish(${p.id})">♡</button>
+      </div>
+    `;
+    productsGrid.appendChild(div);
+  });
+}
+
+function renderCart(){
+  const el = document.getElementById('cartList');
+  const sumEl = document.getElementById('cartSummary');
+  el.innerHTML = '';
+  if(state.cart.length===0){
+    el.innerHTML = '<div class="center muted">Your cart is empty.</div>';
+    sumEl.innerHTML = '';
+    return;
+  }
+  let total = 0;
+  state.cart.forEach(item=>{
+    total += item.qty * item.price;
+    const row = document.createElement('div');
+    row.className = 'cart-row';
+    row.innerHTML = `
+      <img src="${item.img}" alt="${escapeHtml(item.title)}" style="width:80px;height:60px;object-fit:cover;border-radius:6px">
+      <div style="flex:1">
+        <div style="font-weight:600">${escapeHtml(item.title)}</div>
+        <div class="muted">$${item.price.toFixed(2)}</div>
+      </div>
+      <div class="quantity">
+        <button onclick="changeQty(${item.id},-1)">-</button>
+        <input type="number" min="1" value="${item.qty}" onchange="setQty(${item.id},this.value)">
+        <button onclick="changeQty(${item.id},1)">+</button>
+      </div>
+      <div style="width:100px;text-align:right">
+        <div>$${(item.qty*item.price).toFixed(2)}</div>
+        <div style="margin-top:8px"><button onclick="removeFromCart(${item.id})" class="btn">Remove</button></div>
+      </div>
+    `;
+    el.appendChild(row);
+  });
+  sumEl.innerHTML = `<div style="display:flex;justify-content:space-between"><div>Subtotal</div><div>$${total.toFixed(2)}</div></div>
+    <div style="margin-top:8px" class="muted">Shipping & taxes calculated at checkout</div>`;
+  updateCheckoutSummary();
+}
+
+function renderProductDetail(id){
+  const p = state.products.find(x=>x.id===id);
+  if(!p) return goHome();
+  const container = document.getElementById('productDetailCard');
+  container.innerHTML = `
+    <div class="prod-media card" style="flex:1">
+      <img src="${p.img}" alt="${escapeHtml(p.title)}" style="width:100%;height:320px;object-fit:cover;border-radius:6px">
+      <div style="margin-top:8px" class="muted">In stock: ${p.stock}</div>
+    </div>
+    <div class="prod-info card" style="flex:1">
+      <div><span class="badge">Best Seller</span></div>
+      <h2 style="margin-top:10px">${escapeHtml(p.title)}</h2>
+      <div class="muted">Rating: ${p.rating}</div>
+      <div style="margin-top:8px">${escapeHtml(p.desc)}</div>
+      <div class="price" style="font-size:20px;margin-top:16px">$${p.price.toFixed(2)}</div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
+        <button class="btn" onclick="toggleWish(${p.id})">Add to Wishlist</button>
+      </div>
+      <hr style="margin:12px 0">
+      <div>
+        <strong>Customer reviews</strong>
+        <div class="muted" style="margin-top:8px">No reviews yet — be the first!</div>
+      </div>
+    </div>
+  `;
+}
+
+/* -----------------------------
+  ROUTING
+--------------------------------*/
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  const el = document.getElementById('page-'+name);
+  if(el) el.classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function goHome(){ location.hash=''; showPage('products'); }
+function goCart(){ location.hash='cart'; showPage('cart'); renderCart(); }
+function goCheckout(){ location.hash='checkout'; showPage('checkout'); updateCheckoutSummary(); populateCheckout(); }
+
+window.addEventListener('hashchange', handleRoute);
+window.addEventListener('load', ()=>{
+  initUI();
+  handleRoute();
+  updateCounts();
+});
+
+function handleRoute(){
+  const h = location.hash.replace('#','');
+  if(!h) { showPage('products'); return renderProducts(state.products); }
+  if(h.startsWith('product-')){
+    const id = parseInt(h.split('-')[1],10);
+    state.current = id;
+    renderProductDetail(id);
+    showPage('product');
+    return;
+  }
+  if(h==='cart'){ renderCart(); showPage('cart'); return; }
+  if(h==='checkout'){ goCheckout(); return; }
+}
+
+/* -----------------------------
+  INTERACTIONS
+--------------------------------*/
+function addToCart(id){
+  const p = state.products.find(x=>x.id===id);
+  if(!p) return;
+  const existing = state.cart.find(x=>x.id===id);
+  if(existing) existing.qty++;
+  else state.cart.push({id:p.id,title:p.title,price:p.price,qty:1,img:p.img});
+  saveState();
+  alert(p.title + ' added to cart');
+  updateCartViewMini();
+}
+
+function changeQty(id,delta){
+  const it = state.cart.find(x=>x.id===id);
+  if(!it) return;
+  it.qty = Math.max(1,it.qty + delta);
+  saveState();
+  renderCart();
+}
+
+function setQty(id,val){
+  const it = state.cart.find(x=>x.id===id);
+  if(!it) return;
+  it.qty = Math.max(1,Number(val)||1);
+  saveState();
+  renderCart();
+}
+
+function removeFromCart(id){
+  state.cart = state.cart.filter(x=>x.id!==id);
+  saveState();
+  renderCart();
+}
+
+function toggleWish(id){
+  const idx = state.wishlist.indexOf(id);
+  if(idx>-1) state.wishlist.splice(idx,1);
+  else state.wishlist.push(id);
+  saveState();
+  updateCounts();
+  alert('Wishlist updated');
+}
+
+function updateCounts(){
+  cartCount.innerText = state.cart.reduce((s,i)=>s+i.qty,0);
+  wishCount.innerText = state.wishlist.length;
+  document.getElementById('cartCount').innerText = state.cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('wishCount').innerText = state.wishlist.length;
+}
+
+function updateCheckoutSummary(){
+  const listEl = document.getElementById('checkoutItems');
+  const totalEl = document.getElementById('checkoutTotal');
+  if(!listEl) return;
+  listEl.innerHTML = '';
+  let total = 0;
+  state.cart.forEach(i=>{
+    total += i.price*i.qty;
+    const r = document.createElement('div');
+    r.innerHTML = `${escapeHtml(i.title)} x ${i.qty} — $${(i.price*i.qty).toFixed(2)}`;
+    listEl.appendChild(r);
+  });
+  totalEl.innerText = '$'+total.toFixed(2);
+}
+
+/* -----------------------------
+  SEARCH / FILTER / SORT
+--------------------------------*/
+document.getElementById('searchBtn').addEventListener('click', ()=>{
+  applySearch();
+});
+document.getElementById('searchInput').addEventListener('keypress', (e)=>{
+  if(e.key==='Enter') applySearch();
+});
+document.getElementById('sortSelect').addEventListener('change', applySearch);
+document.getElementById('applyFilters').addEventListener('click', applySearch);
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  document.getElementById('searchInput').value='';
+  document.getElementById('minPrice').value='';
+  document.getElementById('maxPrice').value='';
+  document.querySelector('input[name="cat"][value="all"]').checked = true;
+  applySearch();
+});
+
+function applySearch(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const min = Number(document.getElementById('minPrice').value) || 0;
+  const max = Number(document.getElementById('maxPrice').value) || Infinity;
+  const cat = document.querySelector('input[name="cat"]:checked').value;
+  const sort = document.getElementById('sortSelect').value;
+
+  let out = state.products.filter(p=>{
+    if(p.price < min || p.price > max) return false;
+    if(cat!=='all' && p.cat!==cat) return false;
+    if(q && !(p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  if(sort==='price-asc') out.sort((a,b)=>a.price-b.price);
+  if(sort==='price-desc') out.sort((a,b)=>b.price-a.price);
+  if(sort==='rating') out.sort((a,b)=>b.rating-b.rating);
+
+  renderProducts(out);
+}
+
+/* -----------------------------
+  CHECKOUT FORM SUBMIT
+--------------------------------*/
+function populateCheckout(){
+  document.getElementById('checkoutForm').name.value = 'John Doe';
+  document.getElementById('checkoutForm').address.value = '123 Main St';
+  document.getElementById('checkoutForm').city.value = 'Metropolis';
+  document.getElementById('checkoutForm').zip.value = '12345';
+  document.getElementById('checkoutForm').card.value = '4111 1111 1111 1111';
+  document.getElementById('checkoutForm').exp.value = '12/26';
+  document.getElementById('checkoutForm').cvv.value = '123';
+}
+
+document.getElementById('checkoutForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  if(state.cart.length===0){ alert('Cart is empty'); return; }
+  // mock order placement
+  const order = {
+    id: 'ORD'+Math.floor(Math.random()*90000+10000),
+    total: state.cart.reduce((s,i)=>s+i.price*i.qty,0),
+    items: state.cart.slice(),
+    ts: Date.now()
+  };
+  localStorage.setItem('last_order', JSON.stringify(order));
+  // clear cart
+  state.cart = [];
+  saveState();
+  alert('Order placed: '+order.id + '\\nTotal: $'+order.total.toFixed(2));
+  location.hash = '';
+  handleRoute();
+});
+
+/* -----------------------------
+  SMALL HELPERS
+--------------------------------*/
+function viewProduct(id){ location.hash = 'product-'+id; }
+function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initUI(){
+  renderProducts(state.products);
+  updateCounts();
+  document.getElementById('cartBtn').addEventListener('click', goCart);
+  document.getElementById('wishlistBtn').addEventListener('click', ()=>alert('Wishlist: '+(state.wishlist.length||0)+' items'));
+  // keyboard shortcut: "c" go cart
+  window.addEventListener('keydown', (e)=>{ if(e.key==='c') goCart(); });
+  // load from hash if product id present
+  if(location.hash && location.hash.startsWith('#product-')){
+    handleRoute();
+  }
+}
+function updateCartViewMini(){ updateCounts(); renderProducts(state.products); }
+
+/* Expose some functions for manual testing in console */
+window._shop = {
+  addToCart, removeFromCart, state
+};
+</script>
+
+
+</body></html>
