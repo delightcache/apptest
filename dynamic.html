@@ -1,0 +1,630 @@
+<html lang="en"><head>
+
+<!-- Start VWO dynamic SmartCode loader
+  Query params:
+    id          — account id (default 21000247)
+    env         — testapp | staging | prod   (affects SmartCode 3.0 tag path)
+    smartcode   — 3.0 | 2.2 | 2.1 | 2.0 | 1.5  (default 3.0)
+    dacdnDomain — host override (default dev.visualwebsiteoptimizer.com)
+
+  Examples:
+    ?id=21000247&env=testapp&smartcode=3.0
+    ?id=1232918&env=staging&smartcode=3.0
+    ?id=1232918&env=prod&smartcode=3.0
+    ?id=21000247&smartcode=2.2
+-->
+<link id="vwoPreconnect" rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
+<script type="text/javascript" id="vwoCode">
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var env = (params.get('env') || 'testapp').toLowerCase();
+  var smartcode = (params.get('smartcode') || '3.0').toLowerCase();
+  var domain = params.get('dacdnDomain') || 'dev.visualwebsiteoptimizer.com';
+  var accountId = parseInt(params.get('id'), 10);
+  if (!accountId) accountId = 21000247;
+
+  var ENV_TAG_PATH = {
+    testapp: '/cloud-run-test/final/',
+    staging: '/tags/',
+    prod: '/tag/'
+  };
+  if (!ENV_TAG_PATH[env]) {
+    console.warn('[dynamic] unknown env=' + env + ' — falling back to testapp');
+    env = 'testapp';
+  }
+  var tagPath = ENV_TAG_PATH[env];
+
+  // SmartCode bodies (base64) — versions from app-v3 async-smartCode minified templates
+  var SMARTCODES_B64 = {"3.0": "d2luZG93Ll92d29fY29kZSB8fCAoZnVuY3Rpb24gKCkgewp2YXIgYWNjb3VudF9pZD1fX0FDQ09VTlRfSURfXywKdmVyc2lvbj0zLjAsCnNldHRpbmdzX3RvbGVyYW5jZT0yMDAwLApoaWRlX2VsZW1lbnQ9J2JvZHknLApoaWRlX2VsZW1lbnRfc3R5bGUgPQonb3BhY2l0eTowICFpbXBvcnRhbnQ7ZmlsdGVyOmFscGhhKG9wYWNpdHk9MCkgIWltcG9ydGFudDtiYWNrZ3JvdW5kOm5vbmUgIWltcG9ydGFudDt0cmFuc2l0aW9uOm5vbmUgIWltcG9ydGFudCc7CgovKiBETyBOT1QgRURJVCBCRUxPVyBUSElTIExJTkUgKi8KdmFyIHQ9d2luZG93LG49ZG9jdW1lbnQ7aWYoLTE8bi5VUkwuaW5kZXhPZignX192d29fZGlzYWJsZV9fJyl8fHQuX3Z3b19jb2RlKXJldHVybjt2YXIgaT0hMSxvPW4uY3VycmVudFNjcmlwdCxlPXtzVDpzZXR0aW5nc190b2xlcmFuY2UsaEVTOmhpZGVfZWxlbWVudF9zdHlsZSxoRTpoaWRlX2VsZW1lbnR9O3RyeXtlPU9iamVjdC5hc3NpZ24oSlNPTi5wYXJzZShsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnX3Z3b18nK2FjY291bnRfaWQrJ19jb25maWcnKSksZSl9Y2F0Y2goZSl7fXZhciBjb2RlPXtub25jZTpvLm5vbmNlLHNldHRpbmdzX3RvbGVyYW5jZTpmdW5jdGlvbigpe3JldHVybiBlLnNUfSxoaWRlX2VsZW1lbnQ6ZnVuY3Rpb24oKXtyZXR1cm4gcGVyZm9ybWFuY2UuZ2V0RW50cmllc0J5TmFtZSgnZmlyc3QtY29udGVudGZ1bC1wYWludCcpWzBdPycnOmUuaEV9LGhpZGVfZWxlbWVudF9zdHlsZTpmdW5jdGlvbigpe3JldHVybid7JytlLmhFUysnfSd9LGdldFZlcnNpb246ZnVuY3Rpb24oKXtyZXR1cm4gdmVyc2lvbn0sZmluaXNoOmZ1bmN0aW9uKCl7dmFyIGU7IWkmJihpPSEwLGU9bi5nZXRFbGVtZW50QnlJZCgnX3Zpc19vcHRfcGF0aF9oaWRlcycpKSYmZS5wYXJlbnROb2RlLnJlbW92ZUNoaWxkKGUpfSxmaW5pc2hlZDpmdW5jdGlvbigpe3JldHVybiBpfSxhZGRTY3JpcHQ6ZnVuY3Rpb24oZSl7dmFyIHQ9bi5jcmVhdGVFbGVtZW50KCdzY3JpcHQnKTt0LnNyYz1lLG8ubm9uY2UmJnQuc2V0QXR0cmlidXRlKCdub25jZScsby5ub25jZSksdC5mZXRjaFByaW9yaXR5PSdoaWdoJyxuLmhlYWQuYXBwZW5kQ2hpbGQodCl9LGluaXQ6ZnVuY3Rpb24oKXt0Ll92d29fc2V0dGluZ3NfdGltZXI9c2V0VGltZW91dChmdW5jdGlvbigpe2NvZGUuZmluaXNoKCl9LHRoaXMuc2V0dGluZ3NfdG9sZXJhbmNlKCkpO3ZhciBlPW4uY3JlYXRlRWxlbWVudCgnc3R5bGUnKTtlLmlkPSdfdmlzX29wdF9wYXRoX2hpZGVzJyxvLm5vbmNlJiZlLnNldEF0dHJpYnV0ZSgnbm9uY2UnLG8ubm9uY2UpLGUudGV4dENvbnRlbnQ9dGhpcy5oaWRlX2VsZW1lbnQoKSt0aGlzLmhpZGVfZWxlbWVudF9zdHlsZSgpLG4uaGVhZC5hcHBlbmRDaGlsZChlKSx0aGlzLmFkZFNjcmlwdCgnaHR0cHM6Ly9fX0RPTUFJTl9fX19UQUdfUEFUSF9fJythY2NvdW50X2lkKycuanMnKX19O3QuX3Z3b19jb2RlPWNvZGU7Y29kZS5pbml0KCk7fSkoKTs=", "2.2": "d2luZG93Ll92d29fY29kZSB8fAooZnVuY3Rpb24gKCkgewp2YXIgdz13aW5kb3csCmQ9ZG9jdW1lbnQ7CnZhciBhY2NvdW50X2lkPV9fQUNDT1VOVF9JRF9fLAp2ZXJzaW9uPTIuMiwKc2V0dGluZ3NfdG9sZXJhbmNlPTIwMDAsCnBsYXRmb3JtPSd3ZWInLApoaWRlX2VsZW1lbnQ9J2JvZHknLApoaWRlX2VsZW1lbnRfc3R5bGU9J29wYWNpdHk6MCAhaW1wb3J0YW50O2ZpbHRlcjphbHBoYShvcGFjaXR5PTApICFpbXBvcnRhbnQ7YmFja2dyb3VuZDpub25lICFpbXBvcnRhbnQnOwovKiBETyBOT1QgRURJVCBCRUxPVyBUSElTIExJTkUgKi8KaWYoZj0hMSx2PWQucXVlcnlTZWxlY3RvcignI3Z3b0NvZGUnKSxjYz17fSwtMTxkLlVSTC5pbmRleE9mKCdfX3Z3b19kaXNhYmxlX18nKXx8dy5fdndvX2NvZGUpcmV0dXJuO3RyeXt2YXIgZT1KU09OLnBhcnNlKGxvY2FsU3RvcmFnZS5nZXRJdGVtKCdfdndvXycrYWNjb3VudF9pZCsnX2NvbmZpZycpKTtjYz1lJiYnb2JqZWN0Jz09dHlwZW9mIGU/ZTp7fX1jYXRjaChlKXt9ZnVuY3Rpb24gcih0KXt0cnl7cmV0dXJuIGRlY29kZVVSSUNvbXBvbmVudCh0KX1jYXRjaChlKXtyZXR1cm4gdH19dmFyIHM9ZnVuY3Rpb24oKXt2YXIgZT17Y29tYmluYXRpb246W10sY29tYmluYXRpb25DaG9vc2U6W10sc3BsaXQ6W10sZXhjbHVkZTpbXSx1dWlkOm51bGwsY29uc2VudDpudWxsLG9wdE91dDpudWxsfSx0PWQuY29va2llfHwnJztpZighdClyZXR1cm4gZTtmb3IodmFyIG4saSxvPS8oPzpefDtccyopKD86KF92aXNfb3B0X2V4cF8oXGQrKV9jb21iaT0oW147XSopKXwoX3Zpc19vcHRfZXhwXyhcZCspX2NvbWJpX2Nob29zZT0oW147XSopKXwoX3Zpc19vcHRfZXhwXyhcZCspX3NwbGl0PShbXjo7XSopKXwoX3Zpc19vcHRfZXhwXyhcZCspX2V4Y2x1ZGU9W147XSopfChfdmlzX29wdF9vdXQ9KFteO10qKSl8KF92d29fZ2xvYmFsX29wdF9vdXQ9W147XSopfChfdndvX3V1aWQ9KFteO10qKSl8KF92d29fY29uc2VudD0oW147XSopKSkvZztudWxsIT09KG49by5leGVjKHQpKTspdHJ5e25bMV0/ZS5jb21iaW5hdGlvbi5wdXNoKHtpZDpuWzJdLHZhbHVlOnIoblszXSl9KTpuWzRdP2UuY29tYmluYXRpb25DaG9vc2UucHVzaCh7aWQ6bls1XSx2YWx1ZTpyKG5bNl0pfSk6bls3XT9lLnNwbGl0LnB1c2goe2lkOm5bOF0sdmFsdWU6cihuWzldKX0pOm5bMTBdP2UuZXhjbHVkZS5wdXNoKHtpZDpuWzExXX0pOm5bMTJdP2Uub3B0T3V0PXIoblsxM10pOm5bMTRdP2Uub3B0T3V0PSEwOm5bMTVdP2UudXVpZD1yKG5bMTZdKTpuWzE3XSYmKGk9cihuWzE4XSksZS5jb25zZW50PWkmJjM8PWkubGVuZ3RoP2kuc3Vic3RyaW5nKDAsMyk6bnVsbCl9Y2F0Y2goZSl7fXJldHVybiBlfSgpO2Z1bmN0aW9uIGkoKXt2YXIgZT1mdW5jdGlvbigpe2lmKHcuVldPJiZBcnJheS5pc0FycmF5KHcuVldPKSlmb3IodmFyIGU9MDtlPHcuVldPLmxlbmd0aDtlKyspe3ZhciB0PXcuVldPW2VdO2lmKEFycmF5LmlzQXJyYXkodCkmJignc2V0VmlzaXRvcklkJz09PXRbMF18fCdzZXRTZXNzaW9uSWQnPT09dFswXSkpcmV0dXJuITB9cmV0dXJuITF9KCksdD0nYT0nK2FjY291bnRfaWQrJyZ1PScrZW5jb2RlVVJJQ29tcG9uZW50KHcuX3Zpc19vcHRfdXJsfHxkLlVSTCkrJyZ2bj0nK3ZlcnNpb24rJyZwaD0xJysoJ3VuZGVmaW5lZCchPXR5cGVvZiBwbGF0Zm9ybT8nJnA9JytwbGF0Zm9ybTonJykrJyZzdD0nK3cucGVyZm9ybWFuY2Uubm93KCk7ZXx8KChuPWZ1bmN0aW9uKCl7dmFyIGUsdD1bXSxuPXt9LGk9dy5WV08mJncuVldPLmFwcGxpZWRDYW1wYWlnbnN8fHt9O2ZvcihlIGluIGkpe3ZhciBvPWlbZV0mJmlbZV0udjtvJiYodC5wdXNoKGUrJy0nK28rJy0xJyksbltlXT0hMCl9aWYocyYmcy5jb21iaW5hdGlvbilmb3IodmFyIHI9MDtyPHMuY29tYmluYXRpb24ubGVuZ3RoO3IrKyl7dmFyIGE9cy5jb21iaW5hdGlvbltyXTtuW2EuaWRdfHx0LnB1c2goYS5pZCsnLScrYS52YWx1ZSl9cmV0dXJuIHQuam9pbignfCcpfSgpKSYmKHQrPScmYz0nK24pLChuPWZ1bmN0aW9uKCl7dmFyIGU9W10sdD17fTtpZihzJiZzLmNvbWJpbmF0aW9uQ2hvb3NlKWZvcih2YXIgbj0wO248cy5jb21iaW5hdGlvbkNob29zZS5sZW5ndGg7bisrKXt2YXIgaT1zLmNvbWJpbmF0aW9uQ2hvb3NlW25dO2UucHVzaChpLmlkKyctJytpLnZhbHVlKSx0W2kuaWRdPSEwfWlmKHMmJnMuc3BsaXQpZm9yKHZhciBvPTA7bzxzLnNwbGl0Lmxlbmd0aDtvKyspdFsoaT1zLnNwbGl0W29dKS5pZF18fGUucHVzaChpLmlkKyctJytpLnZhbHVlKTtyZXR1cm4gZS5qb2luKCd8Jyl9KCkpJiYodCs9JyZjYz0nK24pLChuPWZ1bmN0aW9uKCl7dmFyIGU9e30sdD1bXTtpZih3LlZXTyYmQXJyYXkuaXNBcnJheSh3LlZXTykpZm9yKHZhciBuPTA7bjx3LlZXTy5sZW5ndGg7bisrKXt2YXIgaT13LlZXT1tuXTtpZihBcnJheS5pc0FycmF5KGkpJiYnc2V0VmFyaWF0aW9uJz09PWlbMF0mJmlbMV0mJkFycmF5LmlzQXJyYXkoaVsxXSkpZm9yKHZhciBvPTA7bzxpWzFdLmxlbmd0aDtvKyspe3ZhciByLGE9aVsxXVtvXTthJiYnb2JqZWN0Jz09dHlwZW9mIGEmJihyPWEuZSxhPWEudixyJiZhJiYoZVtyXT1hKSl9fWZvcihyIGluIGUpdC5wdXNoKHIrJy0nK2Vbcl0pO3JldHVybiB0LmpvaW4oJ3wnKX0oKSkmJih0Kz0nJnN2PScrbikpLHMmJnMub3B0T3V0JiYodCs9JyZvPScrcy5vcHRPdXQpO3ZhciBuPWZ1bmN0aW9uKCl7dmFyIGU9W10sdD17fTtpZihzJiZzLmV4Y2x1ZGUpZm9yKHZhciBuPTA7bjxzLmV4Y2x1ZGUubGVuZ3RoO24rKyl7dmFyIGk9cy5leGNsdWRlW25dO3RbaS5pZF18fChlLnB1c2goaS5pZCksdFtpLmlkXT0hMCl9cmV0dXJuIGUuam9pbignfCcpfSgpO3JldHVybiBuJiYodCs9JyZlPScrbikscyYmcy51dWlkJiYodCs9JyZpZD0nK3MudXVpZCkscyYmcy5jb25zZW50JiYodCs9JyZjb25zZW50PScrcy5jb25zZW50KSx3Lm5hbWUmJi0xPHcubmFtZS5pbmRleE9mKCdfdmlzX3ByZXZpZXcnKSYmKHQrPScmcE09dHJ1ZScpLHcuVldPJiZ3LlZXTy5lZCYmKHQrPScmZWQ9Jyt3LlZXTy5lZCksdH1jb2RlPXtub25jZTp2JiZ2Lm5vbmNlLGxpYnJhcnlfdG9sZXJhbmNlOmZ1bmN0aW9uKCl7cmV0dXJuJ3VuZGVmaW5lZCchPXR5cGVvZiBsaWJyYXJ5X3RvbGVyYW5jZT9saWJyYXJ5X3RvbGVyYW5jZTp2b2lkIDB9LHNldHRpbmdzX3RvbGVyYW5jZTpmdW5jdGlvbigpe3JldHVybiBjYy5zVHx8c2V0dGluZ3NfdG9sZXJhbmNlfSxoaWRlX2VsZW1lbnRfc3R5bGU6ZnVuY3Rpb24oKXtyZXR1cm4neycrKGNjLmhFU3x8aGlkZV9lbGVtZW50X3N0eWxlKSsnfSd9LGhpZGVfZWxlbWVudDpmdW5jdGlvbigpe3JldHVybiBwZXJmb3JtYW5jZS5nZXRFbnRyaWVzQnlOYW1lKCdmaXJzdC1jb250ZW50ZnVsLXBhaW50JylbMF0/Jyc6J3N0cmluZyc9PXR5cGVvZiBjYy5oRT9jYy5oRTpoaWRlX2VsZW1lbnR9LGdldFZlcnNpb246ZnVuY3Rpb24oKXtyZXR1cm4gdmVyc2lvbn0sZmluaXNoOmZ1bmN0aW9uKGUpe3ZhciB0O2Z8fChmPSEwLCh0PWQuZ2V0RWxlbWVudEJ5SWQoJ192aXNfb3B0X3BhdGhfaGlkZXMnKSkmJnQucGFyZW50Tm9kZS5yZW1vdmVDaGlsZCh0KSxlJiYoKG5ldyBJbWFnZSkuc3JjPSdodHRwczovL19fRE9NQUlOX18vZWUuZ2lmP2E9JythY2NvdW50X2lkK2UpKX0sZmluaXNoZWQ6ZnVuY3Rpb24oKXtyZXR1cm4gZn0sYWRkU2NyaXB0OmZ1bmN0aW9uKGUpe3ZhciB0PWQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7dC50eXBlPSd0ZXh0L2phdmFzY3JpcHQnLGUuc3JjP3Quc3JjPWUuc3JjOnQudGV4dD1lLnRleHQsdiYmdC5zZXRBdHRyaWJ1dGUoJ25vbmNlJyx2Lm5vbmNlKSxkLmdldEVsZW1lbnRzQnlUYWdOYW1lKCdoZWFkJylbMF0uYXBwZW5kQ2hpbGQodCl9LGxvYWQ6ZnVuY3Rpb24oZSx0KXt0PXR8fHt9O3ZhciBuPW5ldyBYTUxIdHRwUmVxdWVzdDtuLm9wZW4oJ0dFVCcsZSwhMCksbi53aXRoQ3JlZGVudGlhbHM9IXQuZFNDLG4ucmVzcG9uc2VUeXBlPXQucmVzcG9uc2VUeXBlfHwndGV4dCcsbi5vbmxvYWQ9ZnVuY3Rpb24oKXtpZih0Lm9ubG9hZENiKXJldHVybiB0Lm9ubG9hZENiKG4sZSk7MjAwPT09bi5zdGF0dXM/X3Z3b19jb2RlLmFkZFNjcmlwdCh7dGV4dDpuLnJlc3BvbnNlVGV4dH0pOl92d29fY29kZS5maW5pc2goJyZlPWxvYWRpbmdfZmFpbHVyZTonK2UpfSxuLm9uZXJyb3I9ZnVuY3Rpb24oKXtpZih0Lm9uZXJyb3JDYilyZXR1cm4gdC5vbmVycm9yQ2IoZSk7X3Z3b19jb2RlLmZpbmlzaCgnJmU9bG9hZGluZ19mYWlsdXJlOicrZSl9LG4uc2VuZCgpfSxpbml0OmZ1bmN0aW9uKCl7dmFyIGUsdD10aGlzLnNldHRpbmdzX3RvbGVyYW5jZSgpO3cuX3Z3b19zZXR0aW5nc190aW1lcj1zZXRUaW1lb3V0KGZ1bmN0aW9uKCl7X3Z3b19jb2RlLmZpbmlzaCgpfSx0KSwnYm9keSchPT10aGlzLmhpZGVfZWxlbWVudCgpPyhuPWQuY3JlYXRlRWxlbWVudCgnc3R5bGUnKSxlPSh0PXRoaXMuaGlkZV9lbGVtZW50KCkpP3QrdGhpcy5oaWRlX2VsZW1lbnRfc3R5bGUoKTonJyx0PWQuZ2V0RWxlbWVudHNCeVRhZ05hbWUoJ2hlYWQnKVswXSxuLnNldEF0dHJpYnV0ZSgnaWQnLCdfdmlzX29wdF9wYXRoX2hpZGVzJyksdiYmbi5zZXRBdHRyaWJ1dGUoJ25vbmNlJyx2Lm5vbmNlKSxuLnNldEF0dHJpYnV0ZSgndHlwZScsJ3RleHQvY3NzJyksbi5zdHlsZVNoZWV0P24uc3R5bGVTaGVldC5jc3NUZXh0PWU6bi5hcHBlbmRDaGlsZChkLmNyZWF0ZVRleHROb2RlKGUpKSx0LmFwcGVuZENoaWxkKG4pKToobj1kLmdldEVsZW1lbnRzQnlUYWdOYW1lKCdoZWFkJylbMF0sKGU9ZC5jcmVhdGVFbGVtZW50KCdkaXYnKSkuc3R5bGUuY3NzVGV4dD0nei1pbmRleDogMjE0NzQ4MzY0NyAhaW1wb3J0YW50O3Bvc2l0aW9uOiBmaXhlZCAhaW1wb3J0YW50O2xlZnQ6IDAgIWltcG9ydGFudDt0b3A6IDAgIWltcG9ydGFudDt3aWR0aDogMTAwJSAhaW1wb3J0YW50O2hlaWdodDogMTAwJSAhaW1wb3J0YW50O2JhY2tncm91bmQ6IHdoaXRlICFpbXBvcnRhbnQ7JyxlLnNldEF0dHJpYnV0ZSgnaWQnLCdfdmlzX29wdF9wYXRoX2hpZGVzJyksZS5jbGFzc0xpc3QuYWRkKCdfdmlzX2hpZGVfbGF5ZXInKSxuLnBhcmVudE5vZGUuaW5zZXJ0QmVmb3JlKGUsbi5uZXh0U2libGluZykpO3ZhciBuPSdodHRwczovL19fRE9NQUlOX18vai5waHA/JytpKCk7LTEhPT13LmxvY2F0aW9uLnNlYXJjaC5pbmRleE9mKCdfdndvX3hocicpP3RoaXMuYWRkU2NyaXB0KHtzcmM6bn0pOnRoaXMubG9hZChuKycmeD10cnVlJyx7bDoxfSl9fTt3Ll92d29fY29kZT1jb2RlO2NvZGUuaW5pdCgpO30pKCk7", "2.1": "d2luZG93Ll92d29fY29kZSB8fAooZnVuY3Rpb24gKCkgewp2YXIgYWNjb3VudF9pZD1fX0FDQ09VTlRfSURfXywKdmVyc2lvbj0yLjEsCnNldHRpbmdzX3RvbGVyYW5jZT0yMDAwLApoaWRlX2VsZW1lbnQ9J2JvZHknLApoaWRlX2VsZW1lbnRfc3R5bGU9J29wYWNpdHk6MCAhaW1wb3J0YW50O2ZpbHRlcjphbHBoYShvcGFjaXR5PTApICFpbXBvcnRhbnQ7YmFja2dyb3VuZDpub25lICFpbXBvcnRhbnQ7dHJhbnNpdGlvbjpub25lICFpbXBvcnRhbnQ7JywKLyogRE8gTk9UIEVESVQgQkVMT1cgVEhJUyBMSU5FICovCmY9ZmFsc2Usdz13aW5kb3csZD1kb2N1bWVudCx2PWQucXVlcnlTZWxlY3RvcignI3Z3b0NvZGUnKSxjSz0nX3Z3b18nK2FjY291bnRfaWQrJ19zZXR0aW5ncycsY2M9e307dHJ5e3ZhciBjPUpTT04ucGFyc2UobG9jYWxTdG9yYWdlLmdldEl0ZW0oJ192d29fJythY2NvdW50X2lkKydfY29uZmlnJykpO2NjPWMmJnR5cGVvZiBjPT09J29iamVjdCc/Yzp7fX1jYXRjaChlKXt9dmFyIHN0VD1jYy5zdFQ9PT0nc2Vzc2lvbic/dy5zZXNzaW9uU3RvcmFnZTp3LmxvY2FsU3RvcmFnZTtjb2RlPXtub25jZTp2JiZ2Lm5vbmNlLGxpYnJhcnlfdG9sZXJhbmNlOmZ1bmN0aW9uKCl7cmV0dXJuIHR5cGVvZiBsaWJyYXJ5X3RvbGVyYW5jZSE9PSd1bmRlZmluZWQnP2xpYnJhcnlfdG9sZXJhbmNlOnVuZGVmaW5lZH0sc2V0dGluZ3NfdG9sZXJhbmNlOmZ1bmN0aW9uKCl7cmV0dXJuIGNjLnNUfHxzZXR0aW5nc190b2xlcmFuY2V9LGhpZGVfZWxlbWVudF9zdHlsZTpmdW5jdGlvbigpe3JldHVybid7JysoY2MuaEVTfHxoaWRlX2VsZW1lbnRfc3R5bGUpKyd9J30saGlkZV9lbGVtZW50OmZ1bmN0aW9uKCl7aWYocGVyZm9ybWFuY2UuZ2V0RW50cmllc0J5TmFtZSgnZmlyc3QtY29udGVudGZ1bC1wYWludCcpWzBdKXtyZXR1cm4nJ31yZXR1cm4gdHlwZW9mIGNjLmhFPT09J3N0cmluZyc/Y2MuaEU6aGlkZV9lbGVtZW50fSxnZXRWZXJzaW9uOmZ1bmN0aW9uKCl7cmV0dXJuIHZlcnNpb259LGZpbmlzaDpmdW5jdGlvbihlKXtpZighZil7Zj10cnVlO3ZhciB0PWQuZ2V0RWxlbWVudEJ5SWQoJ192aXNfb3B0X3BhdGhfaGlkZXMnKTtpZih0KXQucGFyZW50Tm9kZS5yZW1vdmVDaGlsZCh0KTtpZihlKShuZXcgSW1hZ2UpLnNyYz0naHR0cHM6Ly9fX0RPTUFJTl9fL2VlLmdpZj9hPScrYWNjb3VudF9pZCtlfX0sZmluaXNoZWQ6ZnVuY3Rpb24oKXtyZXR1cm4gZn0sYWRkU2NyaXB0OmZ1bmN0aW9uKGUpe3ZhciB0PWQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7dC50eXBlPSd0ZXh0L2phdmFzY3JpcHQnO2lmKGUuc3JjKXt0LnNyYz1lLnNyY31lbHNle3QudGV4dD1lLnRleHR9diYmdC5zZXRBdHRyaWJ1dGUoJ25vbmNlJyx2Lm5vbmNlKTtkLmdldEVsZW1lbnRzQnlUYWdOYW1lKCdoZWFkJylbMF0uYXBwZW5kQ2hpbGQodCl9LGxvYWQ6ZnVuY3Rpb24oZSx0KXt2YXIgbj10aGlzLmdldFNldHRpbmdzKCksaT1kLmNyZWF0ZUVsZW1lbnQoJ3NjcmlwdCcpLHI9dGhpczt0PXR8fHt9O2lmKG4pe2kudGV4dENvbnRlbnQ9bjtkLmdldEVsZW1lbnRzQnlUYWdOYW1lKCdoZWFkJylbMF0uYXBwZW5kQ2hpbGQoaSk7aWYoIXcuVldPfHxWV08uY2FFKXtzdFQucmVtb3ZlSXRlbShjSyk7ci5sb2FkKGUpfX1lbHNle3ZhciBvPW5ldyBYTUxIdHRwUmVxdWVzdDtvLm9wZW4oJ0dFVCcsZSx0cnVlKTtvLndpdGhDcmVkZW50aWFscz0hdC5kU0M7by5yZXNwb25zZVR5cGU9dC5yZXNwb25zZVR5cGV8fCd0ZXh0JztvLm9ubG9hZD1mdW5jdGlvbigpe2lmKHQub25sb2FkQ2Ipe3JldHVybiB0Lm9ubG9hZENiKG8sZSl9aWYoby5zdGF0dXM9PT0yMDB8fG8uc3RhdHVzPT09MzA0KXtfdndvX2NvZGUuYWRkU2NyaXB0KHt0ZXh0Om8ucmVzcG9uc2VUZXh0fSl9ZWxzZXtfdndvX2NvZGUuZmluaXNoKCcmZT1sb2FkaW5nX2ZhaWx1cmU6JytlKX19O28ub25lcnJvcj1mdW5jdGlvbigpe2lmKHQub25lcnJvckNiKXtyZXR1cm4gdC5vbmVycm9yQ2IoZSl9X3Z3b19jb2RlLmZpbmlzaCgnJmU9bG9hZGluZ19mYWlsdXJlOicrZSl9O28uc2VuZCgpfX0sZ2V0U2V0dGluZ3M6ZnVuY3Rpb24oKXt0cnl7dmFyIGU9c3RULmdldEl0ZW0oY0spO2lmKCFlKXtyZXR1cm59ZT1KU09OLnBhcnNlKGUpO2lmKERhdGUubm93KCk+ZS5lKXtzdFQucmVtb3ZlSXRlbShjSyk7cmV0dXJufXJldHVybiBlLnN9Y2F0Y2goZSl7cmV0dXJufX0saW5pdDpmdW5jdGlvbigpe2lmKGQuVVJMLmluZGV4T2YoJ19fdndvX2Rpc2FibGVfXycpPi0xKXJldHVybjt2YXIgZT10aGlzLnNldHRpbmdzX3RvbGVyYW5jZSgpO3cuX3Z3b19zZXR0aW5nc190aW1lcj1zZXRUaW1lb3V0KGZ1bmN0aW9uKCl7X3Z3b19jb2RlLmZpbmlzaCgpO3N0VC5yZW1vdmVJdGVtKGNLKX0sZSk7dmFyIHQ7aWYodGhpcy5oaWRlX2VsZW1lbnQoKSE9PSdib2R5Jyl7dD1kLmNyZWF0ZUVsZW1lbnQoJ3N0eWxlJyk7dmFyIG49dGhpcy5oaWRlX2VsZW1lbnQoKSxpPW4/bit0aGlzLmhpZGVfZWxlbWVudF9zdHlsZSgpOicnLHI9ZC5nZXRFbGVtZW50c0J5VGFnTmFtZSgnaGVhZCcpWzBdO3Quc2V0QXR0cmlidXRlKCdpZCcsJ192aXNfb3B0X3BhdGhfaGlkZXMnKTt2JiZ0LnNldEF0dHJpYnV0ZSgnbm9uY2UnLHYubm9uY2UpO3Quc2V0QXR0cmlidXRlKCd0eXBlJywndGV4dC9jc3MnKTtpZih0LnN0eWxlU2hlZXQpdC5zdHlsZVNoZWV0LmNzc1RleHQ9aTtlbHNlIHQuYXBwZW5kQ2hpbGQoZC5jcmVhdGVUZXh0Tm9kZShpKSk7ci5hcHBlbmRDaGlsZCh0KX1lbHNle3Q9ZC5nZXRFbGVtZW50c0J5VGFnTmFtZSgnaGVhZCcpWzBdO3ZhciBpPWQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7aS5zdHlsZS5jc3NUZXh0PSd6LWluZGV4OiAyMTQ3NDgzNjQ3ICFpbXBvcnRhbnQ7cG9zaXRpb246IGZpeGVkICFpbXBvcnRhbnQ7bGVmdDogMCAhaW1wb3J0YW50O3RvcDogMCAhaW1wb3J0YW50O3dpZHRoOiAxMDAlICFpbXBvcnRhbnQ7aGVpZ2h0OiAxMDAlICFpbXBvcnRhbnQ7YmFja2dyb3VuZDogd2hpdGUgIWltcG9ydGFudDtkaXNwbGF5OiBibG9jayAhaW1wb3J0YW50Oyc7aS5zZXRBdHRyaWJ1dGUoJ2lkJywnX3Zpc19vcHRfcGF0aF9oaWRlcycpO2kuY2xhc3NMaXN0LmFkZCgnX3Zpc19oaWRlX2xheWVyJyk7dC5wYXJlbnROb2RlLmluc2VydEJlZm9yZShpLHQubmV4dFNpYmxpbmcpfXZhciBvPXdpbmRvdy5fdmlzX29wdF91cmx8fGQuVVJMLHM9J2h0dHBzOi8vX19ET01BSU5fXy9qLnBocD9hPScrYWNjb3VudF9pZCsnJnU9JytlbmNvZGVVUklDb21wb25lbnQobykrJyZ2bj0nK3ZlcnNpb247aWYody5sb2NhdGlvbi5zZWFyY2guaW5kZXhPZignX3Z3b194aHInKSE9PS0xKXt0aGlzLmFkZFNjcmlwdCh7c3JjOnN9KX1lbHNle3RoaXMubG9hZChzKycmeD10cnVlJyl9fX07dy5fdndvX2NvZGU9Y29kZTtjb2RlLmluaXQoKTt9KSgpOw==", "2.0": "d2luZG93Ll92d29fY29kZSB8fAooZnVuY3Rpb24gKCkgewp2YXIgYWNjb3VudF9pZD1fX0FDQ09VTlRfSURfXywKdmVyc2lvbj0yLjAsCnNldHRpbmdzX3RvbGVyYW5jZT0yMDAwLApoaWRlX2VsZW1lbnQ9J2JvZHknLApoaWRlX2VsZW1lbnRfc3R5bGU9J29wYWNpdHk6MCAhaW1wb3J0YW50O2ZpbHRlcjphbHBoYShvcGFjaXR5PTApICFpbXBvcnRhbnQ7YmFja2dyb3VuZDpub25lICFpbXBvcnRhbnQ7dHJhbnNpdGlvbjpub25lICFpbXBvcnRhbnQnLAovKiBETyBOT1QgRURJVCBCRUxPVyBUSElTIExJTkUgKi8KZj1mYWxzZSx3PXdpbmRvdyxkPWRvY3VtZW50LHY9ZC5xdWVyeVNlbGVjdG9yKCcjdndvQ29kZScpLGNLPSdfdndvXycrYWNjb3VudF9pZCsnX3NldHRpbmdzJyxjYz17fTt0cnl7dmFyIGM9SlNPTi5wYXJzZShsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnX3Z3b18nK2FjY291bnRfaWQrJ19jb25maWcnKSk7Y2M9YyYmdHlwZW9mIGM9PT0nb2JqZWN0Jz9jOnt9fWNhdGNoKGUpe312YXIgc3RUPWNjLnN0VD09PSdzZXNzaW9uJz93LnNlc3Npb25TdG9yYWdlOncubG9jYWxTdG9yYWdlO2NvZGU9e3VzZV9leGlzdGluZ19qcXVlcnk6ZnVuY3Rpb24oKXtyZXR1cm4gdHlwZW9mIHVzZV9leGlzdGluZ19qcXVlcnkhPT0ndW5kZWZpbmVkJz91c2VfZXhpc3RpbmdfanF1ZXJ5OnVuZGVmaW5lZH0sbGlicmFyeV90b2xlcmFuY2U6ZnVuY3Rpb24oKXtyZXR1cm4gdHlwZW9mIGxpYnJhcnlfdG9sZXJhbmNlIT09J3VuZGVmaW5lZCc/bGlicmFyeV90b2xlcmFuY2U6dW5kZWZpbmVkfSxzZXR0aW5nc190b2xlcmFuY2U6ZnVuY3Rpb24oKXtyZXR1cm4gY2Muc1R8fHNldHRpbmdzX3RvbGVyYW5jZX0saGlkZV9lbGVtZW50X3N0eWxlOmZ1bmN0aW9uKCl7cmV0dXJuJ3snKyhjYy5oRVN8fGhpZGVfZWxlbWVudF9zdHlsZSkrJ30nfSxoaWRlX2VsZW1lbnQ6ZnVuY3Rpb24oKXtyZXR1cm4gdHlwZW9mIGNjLmhFPT09J3N0cmluZyc/Y2MuaEU6aGlkZV9lbGVtZW50fSxnZXRWZXJzaW9uOmZ1bmN0aW9uKCl7cmV0dXJuIHZlcnNpb259LGZpbmlzaDpmdW5jdGlvbigpe2lmKCFmKXtmPXRydWU7dmFyIGU9ZC5nZXRFbGVtZW50QnlJZCgnX3Zpc19vcHRfcGF0aF9oaWRlcycpO2lmKGUpZS5wYXJlbnROb2RlLnJlbW92ZUNoaWxkKGUpfX0sZmluaXNoZWQ6ZnVuY3Rpb24oKXtyZXR1cm4gZn0sbG9hZDpmdW5jdGlvbihlKXt2YXIgdD10aGlzLmdldFNldHRpbmdzKCksbj1kLmNyZWF0ZUVsZW1lbnQoJ3NjcmlwdCcpLGk9dGhpcztpZih0KXtuLnRleHRDb250ZW50PXQ7ZC5nZXRFbGVtZW50c0J5VGFnTmFtZSgnaGVhZCcpWzBdLmFwcGVuZENoaWxkKG4pO2lmKCF3LlZXT3x8VldPLmNhRSl7c3RULnJlbW92ZUl0ZW0oY0spO2kubG9hZChlKX19ZWxzZXtuLmZldGNoUHJpb3JpdHk9J2hpZ2gnO24uc3JjPWU7bi50eXBlPSd0ZXh0L2phdmFzY3JpcHQnO24ub25lcnJvcj1mdW5jdGlvbigpe192d29fY29kZS5maW5pc2goKX07ZC5nZXRFbGVtZW50c0J5VGFnTmFtZSgnaGVhZCcpWzBdLmFwcGVuZENoaWxkKG4pfX0sZ2V0U2V0dGluZ3M6ZnVuY3Rpb24oKXt0cnl7dmFyIGU9c3RULmdldEl0ZW0oY0spO2lmKCFlKXtyZXR1cm59ZT1KU09OLnBhcnNlKGUpO2lmKERhdGUubm93KCk+ZS5lKXtzdFQucmVtb3ZlSXRlbShjSyk7cmV0dXJufXJldHVybiBlLnN9Y2F0Y2goZSl7cmV0dXJufX0saW5pdDpmdW5jdGlvbigpe2lmKGQuVVJMLmluZGV4T2YoJ19fdndvX2Rpc2FibGVfXycpPi0xKXJldHVybjt2YXIgZT10aGlzLnNldHRpbmdzX3RvbGVyYW5jZSgpO3cuX3Z3b19zZXR0aW5nc190aW1lcj1zZXRUaW1lb3V0KGZ1bmN0aW9uKCl7X3Z3b19jb2RlLmZpbmlzaCgpO3N0VC5yZW1vdmVJdGVtKGNLKX0sZSk7dmFyIHQ9ZC5jdXJyZW50U2NyaXB0LG49ZC5jcmVhdGVFbGVtZW50KCdzdHlsZScpLGk9dGhpcy5oaWRlX2VsZW1lbnQoKSxyPXQmJiF0LmFzeW5jJiZpP2krdGhpcy5oaWRlX2VsZW1lbnRfc3R5bGUoKTonJyxjPWQuZ2V0RWxlbWVudHNCeVRhZ05hbWUoJ2hlYWQnKVswXTtuLnNldEF0dHJpYnV0ZSgnaWQnLCdfdmlzX29wdF9wYXRoX2hpZGVzJyk7diYmbi5zZXRBdHRyaWJ1dGUoJ25vbmNlJyx2Lm5vbmNlKTtuLnNldEF0dHJpYnV0ZSgndHlwZScsJ3RleHQvY3NzJyk7aWYobi5zdHlsZVNoZWV0KW4uc3R5bGVTaGVldC5jc3NUZXh0PXI7ZWxzZSBuLmFwcGVuZENoaWxkKGQuY3JlYXRlVGV4dE5vZGUocikpO2MuYXBwZW5kQ2hpbGQobik7dGhpcy5sb2FkKCdodHRwczovL19fRE9NQUlOX18vai5waHA/YT0nK2FjY291bnRfaWQrJyZ1PScrZW5jb2RlVVJJQ29tcG9uZW50KGQuVVJMKSsnJnZuPScrdmVyc2lvbil9fTt3Ll92d29fY29kZT1jb2RlO2NvZGUuaW5pdCgpO30pKCk7", "1.5": "d2luZG93Ll92d29fY29kZT13aW5kb3cuX3Z3b19jb2RlIHx8IChmdW5jdGlvbigpIHsKdmFyIGFjY291bnRfaWQ9X19BQ0NPVU5UX0lEX18sCnZlcnNpb249MS41LApzZXR0aW5nc190b2xlcmFuY2U9MjAwMCwKbGlicmFyeV90b2xlcmFuY2U9MjUwMCwKdXNlX2V4aXN0aW5nX2pxdWVyeT1mYWxzZSwKaXNfc3BhPTEsCmhpZGVfZWxlbWVudD0nYm9keScsCmhpZGVfZWxlbWVudF9zdHlsZT0nb3BhY2l0eTowICFpbXBvcnRhbnQ7ZmlsdGVyOmFscGhhKG9wYWNpdHk9MCkgIWltcG9ydGFudDtiYWNrZ3JvdW5kOm5vbmUgIWltcG9ydGFudDt0cmFuc2l0aW9uOm5vbmUgIWltcG9ydGFudCcsCi8qIERPIE5PVCBFRElUIEJFTE9XIFRISVMgTElORSAqLwpmPWZhbHNlLHc9d2luZG93LGQ9ZG9jdW1lbnQsdndvQ29kZUVsPWQucXVlcnlTZWxlY3RvcignI3Z3b0NvZGUnKSxjb2RlPXt1c2VfZXhpc3RpbmdfanF1ZXJ5OmZ1bmN0aW9uKCl7cmV0dXJuIHVzZV9leGlzdGluZ19qcXVlcnl9LGxpYnJhcnlfdG9sZXJhbmNlOmZ1bmN0aW9uKCl7cmV0dXJuIGxpYnJhcnlfdG9sZXJhbmNlfSxoaWRlX2VsZW1lbnRfc3R5bGU6ZnVuY3Rpb24oKXtyZXR1cm4neycraGlkZV9lbGVtZW50X3N0eWxlKyd9J30sZmluaXNoOmZ1bmN0aW9uKCl7aWYoIWYpe2Y9dHJ1ZTt2YXIgZT1kLmdldEVsZW1lbnRCeUlkKCdfdmlzX29wdF9wYXRoX2hpZGVzJyk7aWYoZSllLnBhcmVudE5vZGUucmVtb3ZlQ2hpbGQoZSl9fSxmaW5pc2hlZDpmdW5jdGlvbigpe3JldHVybiBmfSxsb2FkOmZ1bmN0aW9uKGUpe3ZhciB0PWQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7dC5mZXRjaFByaW9yaXR5PSdoaWdoJzt0LnNyYz1lO3QudHlwZT0ndGV4dC9qYXZhc2NyaXB0Jzt0Lm9uZXJyb3I9ZnVuY3Rpb24oKXtfdndvX2NvZGUuZmluaXNoKCl9O2QuZ2V0RWxlbWVudHNCeVRhZ05hbWUoJ2hlYWQnKVswXS5hcHBlbmRDaGlsZCh0KX0sZ2V0VmVyc2lvbjpmdW5jdGlvbigpe3JldHVybiB2ZXJzaW9ufSxnZXRNYXRjaGVkQ29va2llczpmdW5jdGlvbihlKXt2YXIgdD1bXTtpZihkb2N1bWVudC5jb29raWUpe3Q9ZG9jdW1lbnQuY29va2llLm1hdGNoKGUpfHxbXX1yZXR1cm4gdH0sZ2V0Q29tYmluYXRpb25Db29raWU6ZnVuY3Rpb24oKXt2YXIgZT1jb2RlLmdldE1hdGNoZWRDb29raWVzKC8oPzpefDspXHM/KF92aXNfb3B0X2V4cF9cZCtfY29tYmk9W147JF0qKS9naSk7ZT1lLm1hcChmdW5jdGlvbihlKXt0cnl7dmFyIHQ9ZGVjb2RlVVJJQ29tcG9uZW50KGUpO2lmKCEvX3Zpc19vcHRfZXhwX1xkK19jb21iaT0oPzpcZCssPykrXHMqJC8udGVzdCh0KSl7cmV0dXJuJyd9cmV0dXJuIHR9Y2F0Y2goZSl7cmV0dXJuJyd9fSk7dmFyIGk9W107ZS5mb3JFYWNoKGZ1bmN0aW9uKGUpe3ZhciB0PWUubWF0Y2goLyhbXGQsXSspL2cpO3QmJmkucHVzaCh0LmpvaW4oJy0nKSl9KTtyZXR1cm4gaS5qb2luKCd8Jyl9LGluaXQ6ZnVuY3Rpb24oKXtpZihkLlVSTC5pbmRleE9mKCdfX3Z3b19kaXNhYmxlX18nKT4tMSlyZXR1cm47dy5zZXR0aW5nc190aW1lcj1zZXRUaW1lb3V0KGZ1bmN0aW9uKCl7X3Z3b19jb2RlLmZpbmlzaCgpfSxzZXR0aW5nc190b2xlcmFuY2UpO3ZhciBlPWQuY3VycmVudFNjcmlwdCx0PWQuY3JlYXRlRWxlbWVudCgnc3R5bGUnKSxpPWUmJiFlLmFzeW5jP2hpZGVfZWxlbWVudD9oaWRlX2VsZW1lbnQrJ3snK2hpZGVfZWxlbWVudF9zdHlsZSsnfSc6Jyc6Y29kZS5sQT0xLG49ZC5nZXRFbGVtZW50c0J5VGFnTmFtZSgnaGVhZCcpWzBdO3Quc2V0QXR0cmlidXRlKCdpZCcsJ192aXNfb3B0X3BhdGhfaGlkZXMnKTt2d29Db2RlRWwmJnQuc2V0QXR0cmlidXRlKCdub25jZScsdndvQ29kZUVsLm5vbmNlKTt0LnNldEF0dHJpYnV0ZSgndHlwZScsJ3RleHQvY3NzJyk7aWYodC5zdHlsZVNoZWV0KXQuc3R5bGVTaGVldC5jc3NUZXh0PWk7ZWxzZSB0LmFwcGVuZENoaWxkKGQuY3JlYXRlVGV4dE5vZGUoaSkpO24uYXBwZW5kQ2hpbGQodCk7dmFyIG89dGhpcy5nZXRDb21iaW5hdGlvbkNvb2tpZSgpO3RoaXMubG9hZCgnaHR0cHM6Ly9fX0RPTUFJTl9fL2oucGhwP2E9JythY2NvdW50X2lkKycmdT0nK2VuY29kZVVSSUNvbXBvbmVudChkLlVSTCkrJyZmPScrICtpc19zcGErJyZ2bj0nK3ZlcnNpb24rKG8/JyZjPScrbzonJykpO3JldHVybiBzZXR0aW5nc190aW1lcn19O3cuX3Z3b19zZXR0aW5nc190aW1lciA9IGNvZGUuaW5pdCgpO3JldHVybiBjb2RlO30oKSk7"};
+
+  if (!SMARTCODES_B64[smartcode]) {
+    console.error('[dynamic] unknown smartcode=' + smartcode + ' — use 3.0 | 2.2 | 2.1 | 2.0 | 1.5');
+    return;
+  }
+
+  var pre = document.getElementById('vwoPreconnect');
+  if (pre) pre.href = 'https://' + domain;
+
+  console.log('[dynamic] smartcode=' + smartcode + ' env=' + env + ' id=' + accountId + ' domain=' + domain +
+    (smartcode === '3.0' ? (' tag=' + tagPath + accountId + '.js') : ' (j.php)'));
+
+  var src = atob(SMARTCODES_B64[smartcode])
+    .replace(/__ACCOUNT_ID__/g, String(accountId))
+    .replace(/__DOMAIN__/g, domain)
+    .replace(/__TAG_PATH__/g, tagPath);
+
+  // Execute in-place so currentScript / #vwoCode resolve correctly for the SmartCode.
+  (0, eval)(src);
+})();
+</script>
+<!--End VWO Async SmartCode -->
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ShopSim — Mini Ecommerce SPA</title>
+<style>
+  :root{
+    --accent:#ff6f00; --muted:#666; --bg:#f6f7fb; --card:#fff;
+  }
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:#111}
+  header{background:#fff;border-bottom:1px solid #e6e6e6;padding:12px 18px;display:flex;align-items:center;gap:18px;position:sticky;top:0;z-index:50}
+  header img.logo{height:36px}
+  .search{flex:1;display:flex;gap:8px}
+  .search input{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:6px}
+  .search button{padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer}
+  nav.top-actions{display:flex;gap:10px;align-items:center}
+  nav.top-actions button, .link-btn{background:none;border:1px solid #ddd;padding:8px 10px;border-radius:6px;cursor:pointer}
+  .container{max-width:1100px;margin:18px auto;padding:0 16px}
+  .grid{display:grid;grid-template-columns:250px 1fr;gap:18px}
+  .sidebar{background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee}
+  .content{min-height:60vh}
+  .controls{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+  .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid #eee;padding:10px;border-radius:8px;display:flex;flex-direction:column;height:100%}
+  .card img{width:100%;height:150px;object-fit:cover;border-radius:6px}
+  .card h4{margin:8px 0 6px;font-size:15px}
+  .price{color:var(--accent);font-weight:600;margin-top:auto}
+  .btn{padding:8px 10px;border-radius:6px;border:none;cursor:pointer}
+  .btn-primary{background:var(--accent);color:#fff}
+  .muted{color:var(--muted);font-size:13px}
+  .hidden{display:none}
+  .center{text-align:center}
+  .cart-list{background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee}
+  .cart-row{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px dashed #eee}
+  .cart-row:last-child{border-bottom:none}
+  .quantity{display:flex;align-items:center;gap:6px}
+  input[type=number]{width:60px;padding:6px;border-radius:6px;border:1px solid #ddd}
+  .checkout-summary{background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee;margin-top:12px}
+  footer{padding:20px;text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  /* Product detail */
+  .product-detail{display:flex;gap:20px;flex-wrap:wrap}
+  .prod-media{flex:1;min-width:260px}
+  .prod-info{flex:1;min-width:260px}
+  .badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef7ff;color:#01568a;font-weight:600;font-size:12px}
+  /* responsive */
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+    .sidebar{order:2}
+  }
+</style>
+<body>
+
+<header class="vwo_loaded vwo_loaded_1_0" style="background-color: rgb(255, 127, 0) !important;">
+  <!-- Using uploaded local image as logo (path provided by user) -->
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='36'%3E%3Crect width='120' height='36' fill='%23ff6f00'/%3E%3C/svg%3E" alt="ShopSim Logo" class="logo" onerror="this.style.display='none'" style="display: none;">
+  <div class="search" role="search">
+    <input id="searchInput" placeholder="Search products, brands and more..." aria-label="Search products">
+    <button id="searchBtn">Search</button>
+  </div>
+  <nav class="top-actions" aria-label="Top actions">
+    <button id="wishlistBtn" class="link-btn">Wishlist (<span id="wishCount">0</span>)</button>
+    <button id="cartBtn" class="link-btn">Cart (<span id="cartCount">0</span>)</button>
+  </nav>
+</header>
+
+<main class="container" id="app">
+<a id="Customlink" href="https://testdata.wingified.com/async/analyse.html?id=4001638&amp;test=CoalGoal">
+  Click here for Link
+</a>
+
+  <div id="page-products" class="page">
+    <div class="grid">
+      <aside class="sidebar" aria-label="Filters &amp; categories">
+        <h3>Filters</h3>
+        <div>
+          <label><input type="checkbox" class="filter" value="in-stock" checked=""> In stock</label>
+        </div>
+        <div style="margin-top:10px">
+          <strong>Category</strong>
+          <div><label><input type="radio" name="cat" value="all" checked=""> All</label></div>
+          <div><label><input type="radio" name="cat" value="electronics"> Electronics</label></div>
+          <div><label><input type="radio" name="cat" value="fashion"> Fashion</label></div>
+          <div><label><input type="radio" name="cat" value="home"> Home</label></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <strong>Price</strong>
+          <div><input id="minPrice" placeholder="Min" type="number" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd"></div>
+          <div style="margin-top:6px"><input id="maxPrice" placeholder="Max" type="number" style="width:100%;padding:6px;border-radius:6px;border:1px solid #ddd"></div>
+          <button id="applyFilters" class="btn" style="margin-top:8px">Apply</button>
+        </div>
+      </aside>
+
+      <section class="content" aria-live="polite">
+        <div class="controls">
+          <div><strong id="resultsCount">8</strong> results</div>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <select id="sortSelect" aria-label="Sort">
+              <option value="relevance">Sort: Relevance</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Top Rated</option>
+            </select>
+            <button id="clearBtn" class="btn">Clear</button>
+          </div>
+        </div>
+
+        <div class="products" id="productsGrid" aria-live="polite"><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%232c3e50'/%3E%3C/svg%3E" alt="Noise-Cancelling Headphones">
+      <h4>Noise-Cancelling Headphones</h4>
+      <div class="muted">Rating: 4.5 • electronics</div>
+      <div class="price">$129.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(1)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(1)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(1)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%233498db'/%3E%3C/svg%3E" alt="Smartphone X 128GB">
+      <h4>Smartphone X 128GB</h4>
+      <div class="muted">Rating: 4.7 • electronics</div>
+      <div class="price">$699.00</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(2)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(2)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(2)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%231abc9c'/%3E%3C/svg%3E" alt="Men's Casual Shirt">
+      <h4>Men's Casual Shirt</h4>
+      <div class="muted">Rating: 4.1 • fashion</div>
+      <div class="price">$29.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(3)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(3)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(3)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e67e22'/%3E%3C/svg%3E" alt="Ceramic Mixer Set">
+      <h4>Ceramic Mixer Set</h4>
+      <div class="muted">Rating: 4.2 • home</div>
+      <div class="price">$49.50</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(4)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(4)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(4)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%238e44ad'/%3E%3C/svg%3E" alt="Running Shoes Pro">
+      <h4>Running Shoes Pro</h4>
+      <div class="muted">Rating: 4.6 • fashion</div>
+      <div class="price">$89.00</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(5)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(5)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(5)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%2334495e'/%3E%3C/svg%3E" alt="4K Smart TV 43&quot;">
+      <h4>4K Smart TV 43"</h4>
+      <div class="muted">Rating: 4.4 • electronics</div>
+      <div class="price">$399.00</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(6)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(6)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(6)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23c0392b'/%3E%3C/svg%3E" alt="Blender 500W">
+      <h4>Blender 500W</h4>
+      <div class="muted">Rating: 4 • home</div>
+      <div class="price">$59.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(7)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(7)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(7)">♡</button>
+      </div>
+    </div><div class="card">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e91e63'/%3E%3C/svg%3E" alt="Women’s Handbag">
+      <h4>Women’s Handbag</h4>
+      <div class="muted">Rating: 4.3 • fashion</div>
+      <div class="price">$79.99</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(8)">View</button>
+        <button class="btn btn-primary" onclick="addToCart(8)">Add to cart</button>
+        <button class="btn" onclick="toggleWish(8)">♡</button>
+      </div>
+    </div></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Product Detail -->
+  <div id="page-product" class="page hidden container">
+    <button onclick="goHome()" class="btn" style="margin-bottom:12px">← Back to results</button>
+    <div class="card product-detail" id="productDetailCard"></div>
+  </div>
+
+  <!-- Cart Page -->
+  <div id="page-cart" class="page hidden container">
+    <h2>Your Cart</h2>
+    <div class="cart-list" id="cartList"></div>
+    <div class="checkout-summary" id="cartSummary"></div>
+    <div style="margin-top:12px">
+      <button onclick="goCheckout()" class="btn btn-primary">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Page -->
+  <div id="page-checkout" class="page hidden container">
+    <h2>Checkout</h2>
+    <div style="display:flex;gap:18px;flex-wrap:wrap">
+      <form id="checkoutForm" style="flex:1;min-width:300px;background:var(--card);padding:12px;border-radius:8px;border:1px solid #eee">
+        <h3>Shipping</h3>
+        <input name="name" placeholder="Full name" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <input name="address" placeholder="Address" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <input name="city" placeholder="City" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <input name="zip" placeholder="Postal code" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <h3>Payment</h3>
+        <input name="card" placeholder="Card number (mock)" required="" style="width:100%;padding:8px;margin-bottom:8px;border-radius:6px;border:1px solid #ddd">
+        <div style="display:flex;gap:8px">
+          <input name="exp" placeholder="MM/YY" required="" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ddd">
+          <input name="cvv" placeholder="CVV" required="" style="width:100px;padding:8px;border-radius:6px;border:1px solid #ddd">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:12px">Place Order</button>
+      </form>
+
+      <aside style="width:320px;min-width:260px">
+        <div class="checkout-summary">
+          <h3>Order Summary</h3>
+          <div id="checkoutItems"></div>
+          <hr>
+          <div><strong>Total: </strong> <span id="checkoutTotal">$0</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+</main>
+
+<footer>ShopSim — Test harness for segmentation &amp; personalization flows</footer>
+
+<script>
+/* -----------------------------
+  SAMPLE PRODUCT DATA
+--------------------------------*/
+const PRODUCTS = [
+  {id:1,title:"Noise-Cancelling Headphones",price:129.99,cat:"electronics",rating:4.5,stock:10,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%232c3e50'/%3E%3C/svg%3E",desc:"Comfortable over-ear with 30hr battery."},
+  {id:2,title:"Smartphone X 128GB",price:699.00,cat:"electronics",rating:4.7,stock:6,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%233498db'/%3E%3C/svg%3E",desc:"Flagship level specs with great camera."},
+  {id:3,title:"Men's Casual Shirt",price:29.99,cat:"fashion",rating:4.1,stock:25,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%231abc9c'/%3E%3C/svg%3E",desc:"Breathable fabric, slim fit."},
+  {id:4,title:"Ceramic Mixer Set",price:49.50,cat:"home",rating:4.2,stock:12,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e67e22'/%3E%3C/svg%3E",desc:"Durable, microwave safe."},
+  {id:5,title:"Running Shoes Pro",price:89.00,cat:"fashion",rating:4.6,stock:8,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%238e44ad'/%3E%3C/svg%3E",desc:"Lightweight with great support."},
+  {id:6,title:"4K Smart TV 43\"",price:399.00,cat:"electronics",rating:4.4,stock:4,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%2334495e'/%3E%3C/svg%3E",desc:"Vivid display with smart apps."},
+  {id:7,title:"Blender 500W",price:59.99,cat:"home",rating:4.0,stock:20,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23c0392b'/%3E%3C/svg%3E",desc:"Multi-speed for smoothies and sauces."},
+  {id:8,title:"Women’s Handbag",price:79.99,cat:"fashion",rating:4.3,stock:15,img:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e91e63'/%3E%3C/svg%3E",desc:"Premium faux-leather with zipper pockets."}
+];
+
+/* -----------------------------
+  APP STATE & UTILITIES
+--------------------------------*/
+let state = {
+  products: PRODUCTS.slice(),
+  cart: JSON.parse(localStorage.getItem('shop_cart')||'[]'),
+  wishlist: JSON.parse(localStorage.getItem('shop_wish')||'[]'),
+  current: null // product id
+};
+
+function saveState(){
+  localStorage.setItem('shop_cart', JSON.stringify(state.cart));
+  localStorage.setItem('shop_wish', JSON.stringify(state.wishlist));
+  updateCounts();
+}
+
+/* -----------------------------
+  RENDERING FUNCTIONS
+--------------------------------*/
+const productsGrid = document.getElementById('productsGrid');
+const resultsCount = document.getElementById('resultsCount');
+const cartCount = document.getElementById('cartCount');
+const wishCount = document.getElementById('wishCount');
+
+function renderProducts(list){
+  productsGrid.innerHTML = '';
+  resultsCount.innerText = list.length;
+  if(list.length===0){
+    productsGrid.innerHTML = '<div class="center">No products found</div>';
+    return;
+  }
+  list.forEach(p=>{
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <img src="${p.img}" alt="${escapeHtml(p.title)}">
+      <h4>${escapeHtml(p.title)}</h4>
+      <div class="muted">Rating: ${p.rating} • ${p.cat}</div>
+      <div class="price">$${p.price.toFixed(2)}</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="viewProduct(${p.id})">View</button>
+        <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to cart</button>
+        <button class="btn" onclick="toggleWish(${p.id})">♡</button>
+      </div>
+    `;
+    productsGrid.appendChild(div);
+  });
+}
+
+function renderCart(){
+  const el = document.getElementById('cartList');
+  const sumEl = document.getElementById('cartSummary');
+  el.innerHTML = '';
+  if(state.cart.length===0){
+    el.innerHTML = '<div class="center muted">Your cart is empty.</div>';
+    sumEl.innerHTML = '';
+    return;
+  }
+  let total = 0;
+  state.cart.forEach(item=>{
+    total += item.qty * item.price;
+    const row = document.createElement('div');
+    row.className = 'cart-row';
+    row.innerHTML = `
+      <img src="${item.img}" alt="${escapeHtml(item.title)}" style="width:80px;height:60px;object-fit:cover;border-radius:6px">
+      <div style="flex:1">
+        <div style="font-weight:600">${escapeHtml(item.title)}</div>
+        <div class="muted">$${item.price.toFixed(2)}</div>
+      </div>
+      <div class="quantity">
+        <button onclick="changeQty(${item.id},-1)">-</button>
+        <input type="number" min="1" value="${item.qty}" onchange="setQty(${item.id},this.value)">
+        <button onclick="changeQty(${item.id},1)">+</button>
+      </div>
+      <div style="width:100px;text-align:right">
+        <div>$${(item.qty*item.price).toFixed(2)}</div>
+        <div style="margin-top:8px"><button onclick="removeFromCart(${item.id})" class="btn">Remove</button></div>
+      </div>
+    `;
+    el.appendChild(row);
+  });
+  sumEl.innerHTML = `<div style="display:flex;justify-content:space-between"><div>Subtotal</div><div>$${total.toFixed(2)}</div></div>
+    <div style="margin-top:8px" class="muted">Shipping & taxes calculated at checkout</div>`;
+  updateCheckoutSummary();
+}
+
+function renderProductDetail(id){
+  const p = state.products.find(x=>x.id===id);
+  if(!p) return goHome();
+  const container = document.getElementById('productDetailCard');
+  container.innerHTML = `
+    <div class="prod-media card" style="flex:1">
+      <img src="${p.img}" alt="${escapeHtml(p.title)}" style="width:100%;height:320px;object-fit:cover;border-radius:6px">
+      <div style="margin-top:8px" class="muted">In stock: ${p.stock}</div>
+    </div>
+    <div class="prod-info card" style="flex:1">
+      <div><span class="badge">Best Seller</span></div>
+      <h2 style="margin-top:10px">${escapeHtml(p.title)}</h2>
+      <div class="muted">Rating: ${p.rating}</div>
+      <div style="margin-top:8px">${escapeHtml(p.desc)}</div>
+      <div class="price" style="font-size:20px;margin-top:16px">$${p.price.toFixed(2)}</div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
+        <button class="btn" onclick="toggleWish(${p.id})">Add to Wishlist</button>
+      </div>
+      <hr style="margin:12px 0">
+      <div>
+        <strong>Customer reviews</strong>
+        <div class="muted" style="margin-top:8px">No reviews yet — be the first!</div>
+      </div>
+    </div>
+  `;
+}
+
+/* -----------------------------
+  ROUTING
+--------------------------------*/
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+  const el = document.getElementById('page-'+name);
+  if(el) el.classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function goHome(){ location.hash=''; showPage('products'); }
+function goCart(){ location.hash='cart'; showPage('cart'); renderCart(); }
+function goCheckout(){ location.hash='checkout'; showPage('checkout'); updateCheckoutSummary(); populateCheckout(); }
+
+window.addEventListener('hashchange', handleRoute);
+window.addEventListener('load', ()=>{
+  initUI();
+  handleRoute();
+  updateCounts();
+});
+
+function handleRoute(){
+  const h = location.hash.replace('#','');
+  if(!h) { showPage('products'); return renderProducts(state.products); }
+  if(h.startsWith('product-')){
+    const id = parseInt(h.split('-')[1],10);
+    state.current = id;
+    renderProductDetail(id);
+    showPage('product');
+    return;
+  }
+  if(h==='cart'){ renderCart(); showPage('cart'); return; }
+  if(h==='checkout'){ goCheckout(); return; }
+}
+
+/* -----------------------------
+  INTERACTIONS
+--------------------------------*/
+function addToCart(id){
+  const p = state.products.find(x=>x.id===id);
+  if(!p) return;
+  const existing = state.cart.find(x=>x.id===id);
+  if(existing) existing.qty++;
+  else state.cart.push({id:p.id,title:p.title,price:p.price,qty:1,img:p.img});
+  saveState();
+  alert(p.title + ' added to cart');
+  updateCartViewMini();
+}
+
+function changeQty(id,delta){
+  const it = state.cart.find(x=>x.id===id);
+  if(!it) return;
+  it.qty = Math.max(1,it.qty + delta);
+  saveState();
+  renderCart();
+}
+
+function setQty(id,val){
+  const it = state.cart.find(x=>x.id===id);
+  if(!it) return;
+  it.qty = Math.max(1,Number(val)||1);
+  saveState();
+  renderCart();
+}
+
+function removeFromCart(id){
+  state.cart = state.cart.filter(x=>x.id!==id);
+  saveState();
+  renderCart();
+}
+
+function toggleWish(id){
+  const idx = state.wishlist.indexOf(id);
+  if(idx>-1) state.wishlist.splice(idx,1);
+  else state.wishlist.push(id);
+  saveState();
+  updateCounts();
+  alert('Wishlist updated');
+}
+
+function updateCounts(){
+  cartCount.innerText = state.cart.reduce((s,i)=>s+i.qty,0);
+  wishCount.innerText = state.wishlist.length;
+  document.getElementById('cartCount').innerText = state.cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('wishCount').innerText = state.wishlist.length;
+}
+
+function updateCheckoutSummary(){
+  const listEl = document.getElementById('checkoutItems');
+  const totalEl = document.getElementById('checkoutTotal');
+  if(!listEl) return;
+  listEl.innerHTML = '';
+  let total = 0;
+  state.cart.forEach(i=>{
+    total += i.price*i.qty;
+    const r = document.createElement('div');
+    r.innerHTML = `${escapeHtml(i.title)} x ${i.qty} — $${(i.price*i.qty).toFixed(2)}`;
+    listEl.appendChild(r);
+  });
+  totalEl.innerText = '$'+total.toFixed(2);
+}
+
+/* -----------------------------
+  SEARCH / FILTER / SORT
+--------------------------------*/
+document.getElementById('searchBtn').addEventListener('click', ()=>{
+  applySearch();
+});
+document.getElementById('searchInput').addEventListener('keypress', (e)=>{
+  if(e.key==='Enter') applySearch();
+});
+document.getElementById('sortSelect').addEventListener('change', applySearch);
+document.getElementById('applyFilters').addEventListener('click', applySearch);
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  document.getElementById('searchInput').value='';
+  document.getElementById('minPrice').value='';
+  document.getElementById('maxPrice').value='';
+  document.querySelector('input[name="cat"][value="all"]').checked = true;
+  applySearch();
+});
+
+function applySearch(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const min = Number(document.getElementById('minPrice').value) || 0;
+  const max = Number(document.getElementById('maxPrice').value) || Infinity;
+  const cat = document.querySelector('input[name="cat"]:checked').value;
+  const sort = document.getElementById('sortSelect').value;
+
+  let out = state.products.filter(p=>{
+    if(p.price < min || p.price > max) return false;
+    if(cat!=='all' && p.cat!==cat) return false;
+    if(q && !(p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  if(sort==='price-asc') out.sort((a,b)=>a.price-b.price);
+  if(sort==='price-desc') out.sort((a,b)=>b.price-a.price);
+  if(sort==='rating') out.sort((a,b)=>b.rating-b.rating);
+
+  renderProducts(out);
+}
+
+/* -----------------------------
+  CHECKOUT FORM SUBMIT
+--------------------------------*/
+function populateCheckout(){
+  document.getElementById('checkoutForm').name.value = 'John Doe';
+  document.getElementById('checkoutForm').address.value = '123 Main St';
+  document.getElementById('checkoutForm').city.value = 'Metropolis';
+  document.getElementById('checkoutForm').zip.value = '12345';
+  document.getElementById('checkoutForm').card.value = '4111 1111 1111 1111';
+  document.getElementById('checkoutForm').exp.value = '12/26';
+  document.getElementById('checkoutForm').cvv.value = '123';
+}
+
+document.getElementById('checkoutForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  if(state.cart.length===0){ alert('Cart is empty'); return; }
+  // mock order placement
+  const order = {
+    id: 'ORD'+Math.floor(Math.random()*90000+10000),
+    total: state.cart.reduce((s,i)=>s+i.price*i.qty,0),
+    items: state.cart.slice(),
+    ts: Date.now()
+  };
+  localStorage.setItem('last_order', JSON.stringify(order));
+  // clear cart
+  state.cart = [];
+  saveState();
+  alert('Order placed: '+order.id + '\\nTotal: $'+order.total.toFixed(2));
+  location.hash = '';
+  handleRoute();
+});
+
+/* -----------------------------
+  SMALL HELPERS
+--------------------------------*/
+function viewProduct(id){ location.hash = 'product-'+id; }
+function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initUI(){
+  renderProducts(state.products);
+  updateCounts();
+  document.getElementById('cartBtn').addEventListener('click', goCart);
+  document.getElementById('wishlistBtn').addEventListener('click', ()=>alert('Wishlist: '+(state.wishlist.length||0)+' items'));
+  // keyboard shortcut: "c" go cart
+  window.addEventListener('keydown', (e)=>{ if(e.key==='c') goCart(); });
+  // load from hash if product id present
+  if(location.hash && location.hash.startsWith('#product-')){
+    handleRoute();
+  }
+}
+function updateCartViewMini(){ updateCounts(); renderProducts(state.products); }
+
+/* Expose some functions for manual testing in console */
+window._shop = {
+  addToCart, removeFromCart, state
+};
+</script>
+
+
+</body></html>
